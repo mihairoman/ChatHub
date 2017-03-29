@@ -4,9 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var config = require('./config/config');
+var ConnectMongo = require('connect-mongo')(session);
 
-var index = require('./routes/index');
-var chatrooms = require('./routes/chatrooms');
+var router = require('./routes/routes')(express);
 
 var app = express();
 
@@ -22,9 +24,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({secret: config.sessionSecret, resave: false, saveUninitialized: false}));
 
-app.use('/', index);
-app.use('/chatrooms', chatrooms);
+var env = "production";//process.env.NODE_ENV || 'development';
+
+app.use('/', router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -37,7 +41,10 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if (env === 'development') {
+  console.log('Development mode');
+  app.use(session({secret: config.sessionSecret, resave: false, saveUninitialized: false}));
+
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
@@ -45,6 +52,15 @@ if (app.get('env') === 'development') {
       error: err
     });
   });
+} else {
+  console.log('Production mode');
+  app.use(session({secret: config.sessionSecret, 
+    store: new ConnectMongo({
+      url: config.dbURL, 
+      stringify: true 
+    }), 
+    resave: false, 
+    saveUninitialized: false}));
 }
 
 // production error handler
