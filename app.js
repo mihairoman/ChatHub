@@ -7,6 +7,9 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var config = require('./config/config');
 var ConnectMongo = require('connect-mongo')(session);
+var mongoose = require('mongoose').connect(config.dbURL);
+var passport = require('passport'),
+    TwitterStrategy = require('passport-twitter').Strategy;
 
 var router = require('./routes/routes')(express);
 
@@ -24,9 +27,25 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({secret: config.sessionSecret, resave: false, saveUninitialized: false}));
 
-var env = "production";//process.env.NODE_ENV || 'development';
+var env = process.env.NODE_ENV || 'production';
+
+if (env === 'development') {
+  console.log('Development mode');
+  app.use(session({secret: config.sessionSecret, resave: true, saveUninitialized: true}));
+} else {
+  console.log('Production mode');
+  app.use(session({secret: config.sessionSecret, 
+    store: new ConnectMongo({
+      //url: config.dbURL, 
+      mongooseConnection: mongoose.connections[0],
+      stringify: true 
+    }), 
+    resave: true, 
+    saveUninitialized: true}));
+}
+
+require('./auth/passportAuth')(passport, TwitterStrategy, config, mongoose);
 
 app.use('/', router);
 
@@ -42,9 +61,6 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (env === 'development') {
-  console.log('Development mode');
-  app.use(session({secret: config.sessionSecret, resave: false, saveUninitialized: false}));
-
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
@@ -52,15 +68,6 @@ if (env === 'development') {
       error: err
     });
   });
-} else {
-  console.log('Production mode');
-  app.use(session({secret: config.sessionSecret, 
-    store: new ConnectMongo({
-      url: config.dbURL, 
-      stringify: true 
-    }), 
-    resave: false, 
-    saveUninitialized: false}));
 }
 
 // production error handler
