@@ -8,8 +8,8 @@ var session = require('express-session')
 var config = require('./config/config')
 var ConnectMongo = require('connect-mongo')(session)
 var mongoose = require('mongoose').connect(config.dbURL)
-var passport = require('passport'),
-  TwitterStrategy = require('passport-twitter').Strategy
+var passport = require('passport')
+var TwitterStrategy = require('passport-twitter').Strategy
 
 var router = require('./routes/routes')(express)
 
@@ -21,7 +21,7 @@ app.engine('html', require('hogan-express'))
 app.set('view engine', 'html')
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -79,6 +79,5 @@ app.use(function (err, req, res, next) {
     error: {}
   })
 })
-
 
 module.exports = app

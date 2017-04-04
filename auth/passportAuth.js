@@ -5,7 +5,20 @@ module.exports = function (passport, Strategy, config, mongoose) {
     avatar: String
   })
 
-  var ChatUser = mongoose.model('chatUser', ChatUserSchema)
+  var ChatUserModel = mongoose.model('chatUser', ChatUserSchema)
+
+  passport.serializeUser(function (user, done) {
+    done(null, user.str_id)
+  })
+
+  passport.deserializeUser(function (id, done) {
+    ChatUserModel.findById(id, function (err, user) {
+      if (err) {
+        done(err, null)
+      }
+      done(null, user)
+    })
+  })
 
   passport.use(new Strategy({
     consumerKey: config.tw.appID,
@@ -13,18 +26,25 @@ module.exports = function (passport, Strategy, config, mongoose) {
     callbackURL: config.tw.callbackURL
   }, function (token, tokenSecret, profile, done) {
       // check if user exists in the DB, if not, create one and return the profile
-    ChatUser.findOne({'profileID': profile.id}, function (err, result) {
+    ChatUserModel.findOne({'profileID': profile.id}, function (err, result) {
       if (err) {
-        throw new Error('Something went wrong')
+        done(err, null)
       }
-      var newUser = new ChatUser({
-        profileID: profile.id,
-        fullname: profile.displayName
-      })
-
-      // newChatUser.save(function (err) {
-      //   done(null, newUser)
-      // })
+      if (result) {
+        done(null, result)
+      } else {
+        var newUser = new ChatUserModel({
+          profileID: profile.id_str,
+          fullname: profile.screen_name,
+          avatar: profile.profile_image_url || ''
+        })
+        newUser.save(function (err) {
+          if (err) {
+            done(err, null)
+          }
+          done(null, newUser)
+        })
+      }
     })
   }))
 }
