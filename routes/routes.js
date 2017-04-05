@@ -1,13 +1,20 @@
 /* GET home page. */
-module.exports = function (express) {
+module.exports = function (express, passport) {
   var router = express.Router()
 
   router.get('/', function (req, res, next) {
     res.render('index', {title: 'ChatHub'})
   })
 
+  router.get('/auth/twitter', passport.authenticate('twitter'))
+
+  router.get('/auth/twitter/callback', passport.authenticate('twitter', {
+    successRedirect: '/chatrooms',
+    failureRedirect: '/'
+  }))
+
   router.get('/chatrooms', function (req, res, next) {
-    res.render('chatrooms', {title: 'Chatrooms'})
+    res.render('chatrooms', { title: 'Chatrooms', user: req.user })
   })
 
   router.get('/setcolor', function (req, res, next) {

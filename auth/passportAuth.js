@@ -8,7 +8,7 @@ module.exports = function (passport, Strategy, config, mongoose) {
   var ChatUserModel = mongoose.model('chatUser', ChatUserSchema)
 
   passport.serializeUser(function (user, done) {
-    done(null, user.str_id)
+    done(null, user.id)
   })
 
   passport.deserializeUser(function (id, done) {
