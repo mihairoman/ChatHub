@@ -26,7 +26,7 @@ module.exports = function (passport, Strategy, config, mongoose) {
     callbackURL: config.tw.callbackURL
   }, function (token, tokenSecret, profile, done) {
       // check if user exists in the DB, if not, create one and return the profile
-    ChatUserModel.findOne({'profileID': profile.id}, function (err, result) {
+    ChatUserModel.findOne({'profileID': profile._json.id_str}, function (err, result) {
       if (err) {
         done(err, null)
       }
@@ -34,9 +34,9 @@ module.exports = function (passport, Strategy, config, mongoose) {
         done(null, result)
       } else {
         var newUser = new ChatUserModel({
-          profileID: profile.id_str,
-          fullname: profile.screen_name,
-          avatar: profile.profile_image_url || ''
+          profileID: profile._json.id_str,
+          fullname: profile._json.name,
+          avatar: profile._json.profile_image_url || ''
         })
         newUser.save(function (err) {
           if (err) {
