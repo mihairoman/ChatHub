@@ -9,6 +9,7 @@
 # production
 /build
 config/*.json
+/react
 
 # misc
 .DS_Store
