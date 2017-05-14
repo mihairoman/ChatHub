@@ -1,0 +1,9 @@
+{
+    "dbURL": "mongodb://chathub_user:Start123+@ds143980.mlab.com:43980/chathub",
+    "sessionSecret": "pigscanfly",
+    "tw": {
+        "appID": "5CtxBYzq3ZsHEHWBABHvvVmUf",
+        "appSecret": "WaREzDEmbe1TbP69h7tVZh9lhbdnVrZqHMTRVWqSAXnJ3SjvAh",
+        "callbackURL": "http://127.0.0.1:3000/auth/twitter/callback"
+    }
+}

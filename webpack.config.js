@@ -5,9 +5,9 @@ var path = require('path')
 
 module.exports = {
   devtool: 'cheap-module-source-map',
-  entry: path.resolve(__dirname, 'react', 'index.js'),
+  entry: path.resolve(__dirname, 'client', 'index.js'),
   output: {
-    path: path.resolve(__dirname, 'react', 'dist'),
+    path: path.resolve(__dirname, 'client', 'dist'),
     filename: 'bundle.js'
   },
 
@@ -34,7 +34,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'react', 'index.html')
+      template: path.resolve(__dirname, 'client', 'index.html')
     }),
     new webpack.LoaderOptionsPlugin({
       options: {
