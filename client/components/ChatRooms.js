@@ -19,7 +19,7 @@ class ChatRooms extends React.Component {
       console.log(`Now in ChatRooms: ${response}`)
       return response
     }).catch(
-      console.error('Something wrong happened in ChatRooms auth')
+      console.error('Authentication failed')
     )
   }
 
